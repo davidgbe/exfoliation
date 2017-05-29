@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=16:IB
+#PBS -A lc_pv
+###PBS -q priya
+#PBS -l walltime=24:00:00
+#PBS -d .
+#PBS -M guoqingz@usc.edu
+#PBS -m abe
+
+source /usr/usc/lammps/default/setup.sh
+
+mpirun -np 16 /usr/usc/lammps/default/bin/lmp_g++_openmpi < in.simul > log

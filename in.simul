@@ -1,0 +1,59 @@
+variable Text equal 300.0
+variable Nrun0 equal 10000
+variable sigma equal 3.1
+variable tau equal 1703.41 # fs
+variable dt equal 0.005*${tau}
+variable Tdamp equal 50.0*${dt}
+
+units real
+atom_style atomic
+boundary p p p
+# processors 2 2 4
+# processors 4 4 32
+processors * * *
+
+region mybox block 0.0 201.5 0.0 201.5 0.0 161.2 units box
+
+create_box 1 mybox
+lattice sc ${sigma}
+create_atoms 1 box
+
+mass 1 18.0
+
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+
+variable cutoff equal 2.5*${sigma}
+pair_style lj/cut ${cutoff}
+pair_modify tail yes
+pair_coeff * * 0.596151 ${sigma}
+
+
+thermo_style custom step temp ke etotal press
+thermo_modify flush yes
+thermo 10
+
+min_style cg
+minimize 1.0e-8 1.0e-8 1000 1000
+reset_timestep 0
+dump 1 all atom 1000 relax.lammpstrj
+
+velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
+
+fix nvt all nvt temp ${Text} ${Text} ${Tdamp}
+timestep ${dt}
+run ${Nrun0}
+unfix nvt
+
+fix nve all nve
+run ${Nrun0}
+unfix nve
+undump 1
+
+write_restart restart.equil
+
+
+
+
+
