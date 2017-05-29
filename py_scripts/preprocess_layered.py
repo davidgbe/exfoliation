@@ -24,7 +24,7 @@ def preprocess(arr):
 
 def label_layers(atoms, delta=0.001):
     # declare ordering of atom types by layer
-    types = [1, 2, 1, 3, 4, 3, 5, 6, 5, 7, 8, 7]
+    types = [1, 5, 1, 2, 6, 2, 3, 7, 3, 4, 8, 4]
     # sort by vertical displacement
     atoms = sorted(atoms, key=lambda params: params[3])
     # height for all atoms in layer
