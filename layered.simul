@@ -23,11 +23,13 @@ neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 
 variable cutoff equal 2.5*${sigma}
-pair_style hybrid lj/cut ${cutoff} sw
+pair_style hybrid/overlay lj/cut ${cutoff} sw
 # pair_modify tail yes
-
+pair_coeff * * lj/cut 0.0 0.0
 # for SW potentials
-pair_coeff * * sw mos2.sw S S S S Mo Mo Mo Mo
+# set coefficients for interactions within a layer 
+pair_coeff * * sw mos2_long.sw S1 S2 S3 S4 Mo1 Mo2 Mo3 Mo4
+
 # for LJ potentials
 variable epsilon_lj equal 0.00693
 pair_coeff 1 2 lj/cut ${epsilon_lj} ${sigma}
