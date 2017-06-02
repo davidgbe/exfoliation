@@ -1,5 +1,5 @@
 variable Text equal 300.0
-variable Nrun0 equal 1000
+variable Nrun0 equal 4000
 variable sigma equal 3.13
 variable tau equal 1703.41 # fs
 variable dt equal 0.005*${tau}
@@ -25,7 +25,7 @@ neigh_modify delay 0 every 1 check yes
 variable cutoff equal 2.5*${sigma}
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # pair_modify tail yes
-pair_coeff * * lj/cut 0.0 0.0
+# pair_coeff * * lj/cut 0.0 0.0
 # for SW potentials
 # set coefficients for interactions within a layer 
 pair_coeff * * sw mos2_long.sw S1 S2 S3 S4 Mo1 Mo2 Mo3 Mo4
