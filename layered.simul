@@ -1,5 +1,5 @@
 variable Text equal 300.0
-variable Nrun0 equal 10000
+variable Nrun0 equal 1000
 variable sigma equal 3.13
 variable tau equal 1703.41 # fs
 variable dt equal 0.005*${tau}
@@ -15,7 +15,7 @@ processors * * *
 region simulation_space block 0.0 201.5 0.0 201.5 0.0 161.2 units box
 create_box 8 simulation_space
 
-read_data samples/MoS2unitcell_new.xyz add merge
+read_data samples/replicated_mos2_final.xyz add merge
 
 # mass 1 18.0
 

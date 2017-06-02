@@ -30,7 +30,7 @@ def read_csv(curr_file, rel_path, num_to_discard=0, delimiter=' ', preprocess=No
     data_file.close()
     return all_rows
 
-def write_csv(curr_file, rel_path, delimiter=' ', to_dump=None):
+def write_csv(curr_file, rel_path, delimiter='\t', to_dump=None):
     data_file = open_file(curr_file, rel_path, 'w')
     csv_writer = csv.writer(data_file, delimiter=delimiter)
     if to_dump is not None:
