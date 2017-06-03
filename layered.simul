@@ -34,17 +34,16 @@ pair_coeff * * sw mos2.sw Mo S
 variable epsilon_lj equal 0.00693
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0
-pair_coeff 1 1 lj/cut ${epsilon_lj} ${sigma}
-# pair_coeff 6 1 lj/cut ${epsilon_lj} ${sigma}
+pair_coeff 2 2 lj/cut ${epsilon_lj} ${sigma}
 
 thermo_style custom step temp ke etotal press
 thermo_modify flush yes
 thermo 10
 
+dump 1 all atom 10 relax.lammpstrj
 min_style cg
 minimize 1.0e-8 1.0e-8 1000 1000
 reset_timestep 0
-dump 1 all atom 10 relax.lammpstrj
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
 # npt at 10k for 50000 
