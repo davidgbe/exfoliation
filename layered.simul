@@ -3,7 +3,7 @@ variable Nrun0 equal 10000
 variable sigma equal 3.13
 variable tau equal 1703.41 # fs
 variable dt equal 0.005*${tau}
-variable Tdamp equal 10000.0*${dt}
+variable Tdamp equal 50.0*${dt}
 
 units real
 atom_style atomic
@@ -12,8 +12,8 @@ boundary p p p
 # processors 4 4 32
 processors * * *
 
-region simulation_space block 0.0 3.17 0.0 40.000 0.0 5.490601 units box
-create_box 6 simulation_space
+region unit_two_layer block 0.0 3.17 0.0 40.000 0.0 5.490601 units box
+create_box 6 unit_two_layer
 
 read_data samples/MoS2trueunit.lammps add merge
 
@@ -27,13 +27,10 @@ neigh_modify delay 0 every 1 check yes
 variable cutoff equal 2.5*${sigma}
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentials
-# set coefficients for interactions within a layer 
 pair_coeff * * sw mos2.sw S Mo S S Mo S
-
 # for LJ potentials
 variable epsilon_lj equal 0.00693
 pair_modify tail yes
-pair_coeff * * lj/cut 0.0 0.0
 pair_coeff 1 6 lj/cut ${epsilon_lj} ${sigma}
 pair_coeff 3 4 lj/cut ${epsilon_lj} ${sigma}
 
@@ -47,18 +44,22 @@ min_style cg
 minimize 1.0e-8 1.0e-8 1000 1000
 reset_timestep 0
 
+fix nvt all nvt temp 10.0 300.0 ${Tdamp}
+run 10000
+unfix nvt
+
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
 # npt at 10k for 50000 
 # heat from 10k to 300k in 50000 steps
 
-fix npt all npt temp 10.0 10.0 ${Tdamp} iso 0.0 0.0 100.0
-timestep ${dt}
-run 10000
-unfix npt
+# fix npt all npt temp 10.0 10.0 ${Tdamp} iso 0.4 0.4 100.0
+# timestep ${dt}
+# run 10000
+# unfix npt
 
-fix npt all npt temp 10.0 300.0 ${Tdamp} iso 0.0 0.0 100.0
-run 10000
-unfix npt
+# fix npt all npt temp 10.0 300.0 ${Tdamp} iso 0.4 0.4 100.0
+# run 10000
+# unfix npt
 undump 1
 
 write_restart restart.equil
