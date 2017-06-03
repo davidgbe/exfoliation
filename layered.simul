@@ -13,11 +13,11 @@ boundary p p p
 processors * * *
 
 region simulation_space block 0.0 3.17 0.0 40.000 0.0 5.490601 units box
-create_box 2 simulation_space
+create_box 6 simulation_space
 
 read_data samples/MoS2trueunit.lammps add merge
 
-replicate 5 1 5
+replicate 10 1 10
 
 # mass 1 18.0
 
@@ -28,13 +28,14 @@ variable cutoff equal 2.5*${sigma}
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentials
 # set coefficients for interactions within a layer 
-pair_coeff * * sw mos2.sw Mo S
+pair_coeff * * sw mos2.sw S Mo S S Mo S
 
 # for LJ potentials
 variable epsilon_lj equal 0.00693
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0
-pair_coeff 2 2 lj/cut ${epsilon_lj} ${sigma}
+pair_coeff 1 6 lj/cut ${epsilon_lj} ${sigma}
+pair_coeff 3 4 lj/cut ${epsilon_lj} ${sigma}
 
 thermo_style custom step temp ke etotal press
 thermo_modify flush yes
