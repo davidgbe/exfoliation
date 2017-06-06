@@ -5,19 +5,19 @@ variable tau equal 1703.41 # fs
 variable dt equal 0.005*${tau}
 variable Tdamp equal 50.0*${dt}
 
-units real
+units metal
 atom_style atomic
 boundary p p p
 # processors 2 2 4
 # processors 4 4 32
-processors * * *
+processors * 1 *
 
 region unit_two_layer block 0.0 3.17 0.0 40.000 0.0 5.490601 units box
 create_box 6 unit_two_layer
 
 read_data samples/MoS2trueunit.lammps add merge
 
-replicate 10 1 10
+replicate 5 1 5
 
 # mass 1 18.0
 
@@ -44,9 +44,13 @@ min_style cg
 minimize 1.0e-8 1.0e-8 1000 1000
 reset_timestep 0
 
-fix nvt all nvt temp 10.0 300.0 ${Tdamp}
-run 10000
-unfix nvt
+fix npt all npt temp 10.0 10.0 ${Tdamp} iso 0.0 0.0 100
+run 10000 
+unfix npt
+
+fix npt all npt temp 10.0 300.0 ${Tdamp} iso 0.0 0.0 100
+run 30000
+unfix npt
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
 # npt at 10k for 50000 
