@@ -1,12 +1,9 @@
 #!/bin/bash
 #PBS -l nodes=1:ppn=16:IB
 #PBS -A lc_pv
-###PBS -q priya
-#PBS -l walltime=24:00:00
+#PBS -l walltime=1:00:00
 #PBS -d .
-#PBS -M guoqingz@usc.edu
 #PBS -m abe
 
 source /usr/usc/lammps/default/setup.sh
-
 mpirun -np 16 /staging/dgb/davidgbe/lammps/src/lmp_mpi < layered.simul
