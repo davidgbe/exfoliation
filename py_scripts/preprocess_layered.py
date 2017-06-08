@@ -10,19 +10,19 @@ def merge_elementwise(*lists):
 def map_atom_to_type(atom):
     print(atom)
     d = {
-        '1': 1,
-        '2': 2
+        'S': 1,
+        'Mo': 2
     }
     return d[atom]
 
 def preprocess(arr):
-    print(arr)
     arr = utilities.strip_spaces_from_array(arr)
-    arr[1] = map_atom_to_type(arr[1])
+    arr = arr[2:]
+    # arr[0] = map_atom_to_type(arr[0])
 
-    for i in range(2, len(arr)):
+    for i in range(1, len(arr)):
         arr[i] = float(arr[i])
-    return arr
+    return arr[0:0] + arr[3:]
 
 def label_layers(atoms, delta=0.005):
     # declare ordering of atom types by layer
@@ -41,15 +41,15 @@ def label_layers(atoms, delta=0.005):
     return atoms
 
 def execute():
-    data_path = '../samples/replicated_mos2.xyz'
-    layered_data = utilities.read_csv(__file__, data_path, delimiter='\t', preprocess=preprocess)
+    data_path = '../samples/40_by_40.lammps'
+    layered_data = utilities.read_csv(__file__, data_path, delimiter=' ', preprocess=preprocess)
     num_atoms = len(layered_data)
-    # ids = [[i] for i in range(1, num_atoms + 1)]
-    # atoms = merge_elementwise(ids, layered_data)
+    ids = [[i] for i in range(1, num_atoms + 1)]
+    atoms = merge_elementwise(ids, layered_data)
 
-    atoms = label_layers(layered_data)
+    atoms = label_layers(atoms)
 
-    utilities.write_csv(__file__, '../samples/replicated_mos2_final.xyz', to_dump=atoms, delimiter='\t')
+    utilities.write_csv(__file__, '../samples/processed_40_by_40.lammps', to_dump=atoms, delimiter='\t')
 
 if __name__ == '__main__':
     execute()
