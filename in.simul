@@ -1,22 +1,28 @@
+echo both
 variable Text equal 300.0
-variable Nrun0 equal 10000
+variable Nrun0 equal  20000
 variable sigma equal 3.1
 variable tau equal 1703.41 # fs
 variable dt equal 0.005*${tau}
 variable Tdamp equal 50.0*${dt}
+variable sr equal 1.0e10 # shear rate (s^-1)
 
-units real
-atom_style atomic
-boundary p p p
-# processors 2 2 4
-# processors 4 4 32
-processors * * *
 
-region mybox block 0.0 201.5 0.0 201.5 0.0 161.2 units box
+#units real
+#atom_style atomic
+#boundary p p p
+processors 2 2 4
+#processors 4 4 32
 
-create_box 1 mybox
-lattice sc ${sigma}
-create_atoms 1 box
+#region mybox block 0.0 201.5 0.0 201.5 0.0 161.2 units box
+
+#create_box 1 mybox
+#lattice sc ${sigma}
+#create_atoms 1 box
+
+read_restart ../restart.equil remap
+variable ze equal zhi+6.2
+change_box all z final 0.0 ${ze} units box
 
 mass 1 18.0
 
@@ -24,34 +30,94 @@ neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 
 
-variable cutoff equal 2.5*${sigma}
+variable cutoff equal 5.0*${sigma}
 pair_style lj/cut ${cutoff}
 pair_modify tail yes
 pair_coeff * * 0.596151 ${sigma}
 
 
-thermo_style custom step temp ke etotal press
+
+
+
+
+variable z1 equal zlo+6.2
+region bot block INF INF INF INF INF ${z1} units box
+group bot region bot
+velocity bot set 0.0 0.0 0.0
+fix fbot bot setforce 0.0 0.0 0.0
+
+variable z2 equal zhi-6.2-6.2
+region top block INF INF INF INF ${z2} INF units box
+group top region top
+
+variable Lz equal zhi-zlo-12.4-6.2
+variable v equal ${Lz}*${sr}*1.0e-15
+group mid subtract all top bot
+group wall subtract all mid
+velocity mid ramp vx 0.0 ${v} z ${z1} ${z2} sum yes
+
+velocity top set  ${v} 0.0 0.0
+fix ftop top setforce 0.0 0.0 0.0
+
+compute mytemp mid temp/ramp vx 0.0 ${v} z ${z1} ${z2} units box
+#compute mytemp mid temp/com
+fix midT mid ave/time 1 1 10 c_mytemp
+
+compute cc1 all chunk/atom bin/1d z center 6.2 units box
+fix 4 all ave/chunk 1 1 10 cc1 vx file profile.vx.1d
+
+thermo_style custom step temp f_midT ke etotal press
 thermo_modify flush yes
 thermo 10
 
-min_style cg
-minimize 1.0e-8 1.0e-8 1000 1000
-reset_timestep 0
-dump 1 all atom 1000 relax.lammpstrj
-
-velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
-
-fix nvt all nvt temp ${Text} ${Text} ${Tdamp}
+dump 1 all custom 400 move.lammpstrj id x y z vx vy vz
+fix nvt1 mid nvt temp ${Text} ${Text} ${Tdamp}
+fix_modify nvt1 temp mytemp
+fix nve wall nve 
 timestep ${dt}
 run ${Nrun0}
-unfix nvt
-
-fix nve all nve
-run ${Nrun0}
+unfix nvt1
 unfix nve
-undump 1
 
-write_restart restart.equil
+undump 1
+unfix 4
+
+write_restart restart1.equil
+
+
+region indent block 50 150 50 150 0.0 70.0 units box
+group indent region indent
+velocity indent set 0.0 0.0 0.0
+fix findent indent setforce 0.0 0.0 0.0
+group liquid subtract all indent top bot
+group ext subtract all liquid
+
+fix 4 all ave/chunk 1 1 10 cc1 vx file profile.indet.vx.1d
+
+compute myT liquid temp/com
+fix myT liquid ave/time 1 1 10 c_myT
+
+
+thermo_style custom step temp f_myT ke etotal press
+thermo_modify flush yes
+thermo 10
+
+
+dump 1 all custom 1000 move_indent.lammpstrj id x y z vx vy vz
+
+fix nvt1 liquid nvt temp ${Text} ${Text} ${Tdamp}
+fix_modify nvt1 temp myT
+fix nve ext nve 
+timestep ${dt}
+run ${Nrun0}
+unfix nvt1
+unfix nve
+
+undump 1
+unfix 4
+
+write_restart restart.indent.equil
+
 
 
 

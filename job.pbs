@@ -9,4 +9,4 @@
 
 source /usr/usc/lammps/default/setup.sh
 
-mpirun -np 16 /usr/usc/lammps/default/bin/lmp_g++_openmpi < in.simul > log
+mpirun -np 16 /staging/dgb/davidgbe/lammps/src/lmp_mpi < layered.simul
