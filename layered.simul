@@ -1,6 +1,8 @@
 variable dt equal 1
 variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
+variable minimize_steps equal 100
+variable total_run equal 10
 
 variable sigma_s_s equal 3.13
 variable sigma_w_w equal 3.1
@@ -20,7 +22,12 @@ variable dimen equal 40
 variable x_max equal 3.170000*${dimen}
 variable y_max equal 5.490601*${dimen}
 variable top_vac equal 40.0
-variable z_max equal 12.288000+${top_vac}
+variable lattice_height equal 12.288000
+variable z_max equal ${lattice_height}+${top_vac}
+
+variable water_cyl_rad equal 15.0
+variable water_cyl_z_disp equal ${lattice_height}+${water_cyl_rad}
+variable num_water_molecules equal 500
 
 units real
 atom_style atomic
@@ -30,12 +37,12 @@ processors * 1 *
 region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} 0.0 ${z_max} units box
 create_box 7 unit_two_layer
 
-mass 7 18.0
-
 read_data samples/processed_40_by_40.lammps add merge
 
-neighbor 2.0 bin
-neigh_modify delay 0 every 1 check yes
+mass 7 18.0
+variable half_x equal ${x_max}/2
+variable shaved_y_max equal ${y_max}-0.005
+region water_drop cylinder y ${half_x} ${water_cyl_z_disp} ${water_cyl_rad} 0.0 ${shaved_y_max} units box
 
 group mo type 2 5
 group s type 1 3 4 6
@@ -43,6 +50,11 @@ group w type 7
 set group mo type 1
 set group s type 2
 set group w type 3
+
+create_atoms 3 random ${num_water_molecules} 1203912 water_drop
+
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
 
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentials
@@ -64,7 +76,7 @@ dump 1 all atom 10 relax.lammpstrj
 
 fix min all box/relax x 0.0 y 0.0
 min_style cg
-minimize 1.0e-8 1.0e-8 1000 1000
+minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 unfix min
 # reset_timestep 0
 
@@ -75,7 +87,7 @@ unfix min
 fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
-run 10000
+run ${total_run}
 unfix npt
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
