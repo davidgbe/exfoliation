@@ -2,7 +2,7 @@ variable dt equal 1
 variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 100
-variable total_run equal 10
+variable total_run equal 10000
 
 variable sigma_s_s equal 3.13
 variable sigma_w_w equal 3.1
@@ -18,6 +18,7 @@ variable epsilon_w_s equal 1.120*0.239001
 
 variable cutoff equal 10.0
 
+# define simulation space
 variable dimen equal 40
 variable x_max equal 3.170000*${dimen}
 variable y_max equal 5.490601*${dimen}
@@ -25,16 +26,17 @@ variable top_vac equal 40.0
 variable lattice_height equal 12.288000
 variable z_max equal ${lattice_height}+${top_vac}
 
+# create water droplet
 variable water_cyl_rad equal 15.0
 variable water_cyl_z_disp equal ${lattice_height}+${water_cyl_rad}
-variable num_water_molecules equal 500
+variable num_water_molecules equal 200
 
 units real
 atom_style atomic
-boundary p p p
-processors * 1 *
+boundary p p f
+processors 1 * 1
 
-region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} 0.0 ${z_max} units box
+region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
 create_box 7 unit_two_layer
 
 read_data samples/processed_40_by_40.lammps add merge
@@ -57,7 +59,7 @@ neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 
 pair_style hybrid/overlay lj/cut ${cutoff} sw
-# for SW potentials
+# for SW potentialsvector 0 0 -1
 pair_coeff * * sw mos2_2013.sw Mo S NULL NULL NULL NULL NULL
 # for LJ potentials
 pair_modify tail yes
@@ -72,7 +74,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify flush yes
 thermo 10
 
-dump 1 all atom 10 relax.lammpstrj
+dump 1 all atom 5 relax.lammpstrj
 
 fix min all box/relax x 0.0 y 0.0
 min_style cg
@@ -84,11 +86,15 @@ unfix min
 # run 10000 
 # unfix npt
 
-fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
+fix gravity w gravity 2.352e-16 vector 0 0 -1
+
+fix nvt all nvt temp 300.0 300.0 ${Tdamp} # x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
 run ${total_run}
-unfix npt
+unfix nvt
+
+unfix gravity
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
 # npt at 10k for 50000 
