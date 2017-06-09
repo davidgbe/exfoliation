@@ -65,7 +65,7 @@ reset_timestep 0
 fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
-run 3000
+run 10000
 unfix npt
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
