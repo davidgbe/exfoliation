@@ -27,17 +27,14 @@ variable lattice_height equal 12.288000
 variable z_max equal ${lattice_height}+${top_vac}
 
 # create water droplet
-variable drop_height equal 20.0
-variable drop_width equal 30.0
-variable drop_vol equal ${drop_height}*${drop_width}*${y_max}
+variable drop_height equal 30.0 # max height given by Frédéric Leroy
+variable drop_width equal 45.0
 
 variable half_x equal ${x_max}/2
 variable drop_x_start equal ${half_x}-(${drop_width}/2)
 variable drop_x_end equal ${half_x}+(${drop_width}/2)
-variable drop_z_start equal ${lattice_height}+${water_cyl_rad}
+variable drop_z_start equal ${lattice_height}
 variable drop_z_end equal ${drop_z_start}+${drop_height}
-
-variable num_water_molecules equal 200
 
 units real
 atom_style atomic
@@ -59,7 +56,8 @@ set group mo type 1
 set group s type 2
 set group w type 3
 
-create_atoms 3 random ${num_water_molecules} 1203912 water_drop
+lattice sc 3.104 # 0.033427 molecules per cubic angstrom
+create_atoms 3 region water_drop units box
 
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
@@ -80,13 +78,13 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 5 relax.lammpstrj
-
 fix min all box/relax x 0.0 y 0.0
 min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 unfix min
-# reset_timestep 0
+reset_timestep 0
+
+dump 1 all atom 5 relax.lammpstrj
 
 # fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
