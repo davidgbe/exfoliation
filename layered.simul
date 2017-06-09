@@ -52,20 +52,20 @@ thermo 10
 
 dump 1 all atom 10 relax.lammpstrj
 
-# fix min all box/relax x 0.0 z 0.0
-# min_style cg
-# minimize 1.0e-8 1.0e-8 1000 1000
-# unfix min
-# reset_timestep 0
+fix min all box/relax x 0.0 y 0.0
+min_style cg
+minimize 1.0e-8 1.0e-8 1000 1000
+unfix min
+reset_timestep 0
 
-# fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} z 0.0 0.0 ${Pdamp}
+# fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
 # unfix npt
 
-fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} z 0.0 0.0 ${Pdamp}
+fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
-run 5
+run 3000
 unfix npt
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
