@@ -27,8 +27,16 @@ variable lattice_height equal 12.288000
 variable z_max equal ${lattice_height}+${top_vac}
 
 # create water droplet
-variable water_cyl_rad equal 15.0
-variable water_cyl_z_disp equal ${lattice_height}+${water_cyl_rad}
+variable drop_height equal 20.0
+variable drop_width equal 30.0
+variable drop_vol equal ${drop_height}*${drop_width}*${y_max}
+
+variable half_x equal ${x_max}/2
+variable drop_x_start equal ${half_x}-(${drop_width}/2)
+variable drop_x_end equal ${half_x}+(${drop_width}/2)
+variable drop_z_start equal ${lattice_height}+${water_cyl_rad}
+variable drop_z_end equal ${drop_z_start}+${drop_height}
+
 variable num_water_molecules equal 200
 
 units real
@@ -40,11 +48,9 @@ region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
 create_box 7 unit_two_layer
 
 read_data samples/processed_40_by_40.lammps add merge
-
 mass 7 18.0
-variable half_x equal ${x_max}/2
-variable shaved_y_max equal ${y_max}-0.005
-region water_drop cylinder y ${half_x} ${water_cyl_z_disp} ${water_cyl_rad} 0.0 ${shaved_y_max} units box
+
+region water_drop block ${drop_x_start} ${drop_x_end} 0.0 ${y_max} ${drop_z_start} ${drop_z_end} units box
 
 group mo type 2 5
 group s type 1 3 4 6
