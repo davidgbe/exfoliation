@@ -66,7 +66,7 @@ fix min all box/relax x 0.0 y 0.0
 min_style cg
 minimize 1.0e-8 1.0e-8 1000 1000
 unfix min
-reset_timestep 0
+# reset_timestep 0
 
 # fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
