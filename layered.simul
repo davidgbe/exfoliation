@@ -22,7 +22,7 @@ variable cutoff equal 10.0
 variable dimen equal 40
 variable x_max equal 3.170000*${dimen}
 variable y_max equal 5.490601*${dimen}
-variable top_vac equal 40.0
+variable top_vac equal 120.0
 variable lattice_height equal 12.288000
 variable z_max equal ${lattice_height}+${top_vac}
 
@@ -71,7 +71,7 @@ pair_coeff 1 3 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
 pair_coeff 2 3 lj/cut ${epsilon_w_s} ${sigma_w_s}
 
 thermo_style custom step temp ke etotal press
-thermo_modify flush yes
+thermo_modify lost ignore flush yes
 thermo 10
 
 dump 1 all atom 5 relax.lammpstrj
