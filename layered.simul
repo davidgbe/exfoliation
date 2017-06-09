@@ -2,10 +2,18 @@ variable dt equal 1
 variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
 
-variable sigma_interlayer equal 3.13
-variable sigma_water equal 3.1
-variable epsilon_interlayer equal 0.00693*23.0609 # second number is kcal/mol / ev
-variable epsilon_water equal 0.596151
+variable sigma_s_s equal 3.13
+variable sigma_w_w equal 3.1
+variable sigma_mo_mo equal 4.2 # unused, but taken from the Liang model
+variable sigma_w_mo equal (${sigma_w_w}+${sigma_mo_mo})/2
+variable sigma_w_s equal (${sigma_w_w}+${sigma_s_s})/2
+
+variable epsilon_s_s equal 0.00693*23.0609 # second number is kcal/mol / ev
+variable epsilon_w_w equal 0.596151
+# interaction epsilons provided by Frédéric Leroy in kJ/mol, converted to kCal/mol
+variable epsilon_w_mo equal 0.1917*0.239001
+variable epsilon_w_s equal 1.120*0.239001
+
 variable cutoff equal 10.0
 
 variable dimen equal 40
@@ -43,9 +51,10 @@ pair_coeff * * sw mos2_2013.sw Mo S NULL NULL NULL NULL NULL
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 
 pair_coeff 1 * lj/cut 0.0 0.0
-pair_coeff 2 2 lj/cut ${epsilon_interlayer} ${sigma_interlayer}
-pair_coeff 3 3 lj/cut ${epsilon_water} ${sigma_water}
-# need interactions 3 *
+pair_coeff 2 2 lj/cut ${epsilon_s_s} ${sigma_s_s}
+pair_coeff 3 3 lj/cut ${epsilon_w_w} ${sigma_w_w}
+pair_coeff 1 3 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
+pair_coeff 2 3 lj/cut ${epsilon_w_s} ${sigma_w_s}
 
 thermo_style custom step temp ke etotal press
 thermo_modify flush yes
