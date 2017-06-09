@@ -1,16 +1,18 @@
-variable Nrun0 equal 10000
-variable sigma equal 3.13
-
 variable dt equal 1
 variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
+
+variable sigma_interlayer equal 3.13
+variable sigma_water equal 3.1
+variable epsilon_interlayer equal 0.00693*23.0609 # second number is kcal/mol / ev
+variable epsilon_water equal 0.596151
+variable cutoff equal 10.0
 
 variable dimen equal 40
 variable x_max equal 3.170000*${dimen}
 variable y_max equal 5.490601*${dimen}
 variable top_vac equal 40.0
 variable z_max equal 12.288000+${top_vac}
-
 
 units real
 atom_style atomic
@@ -34,17 +36,16 @@ set group mo type 1
 set group s type 2
 set group w type 3
 
-variable cutoff equal 10.0
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentials
 pair_coeff * * sw mos2_2013.sw Mo S NULL NULL NULL NULL NULL
 # for LJ potentials
-variable epsilon_lj equal 0.00693
 pair_modify tail yes
-
 pair_coeff * * lj/cut 0.0 0.0 
 pair_coeff 1 * lj/cut 0.0 0.0
-pair_coeff 2 2 lj/cut ${epsilon_lj} ${sigma}
+pair_coeff 2 2 lj/cut ${epsilon_interlayer} ${sigma_interlayer}
+pair_coeff 3 3 lj/cut ${epsilon_water} ${sigma_water}
+# need interactions 3 *
 
 thermo_style custom step temp ke etotal press
 thermo_modify flush yes
