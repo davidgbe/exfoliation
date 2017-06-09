@@ -2,6 +2,7 @@
 #PBS -l nodes=1:ppn=16:IB
 #PBS -l walltime=4:00:00
 #PBS -d .
+pwd
 
 source /usr/usc/lammps/default/setup.sh
 mpirun -np 16 /staging/dgb/davidgbe/lammps/src/lmp_mpi < layered.simul
