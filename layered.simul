@@ -91,15 +91,11 @@ dump 1 all atom 5 relax.lammpstrj
 # run 10000 
 # unfix npt
 
-fix gravity w gravity 2.352e-16 vector 0 0 -1
-
 fix nvt all nvt temp 300.0 300.0 ${Tdamp}
 # velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
 run ${total_run}
 unfix nvt
-
-unfix gravity
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
 # npt at 10k for 50000 
