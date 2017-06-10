@@ -2,7 +2,7 @@ variable dt equal 1
 variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 100
-variable total_run equal 10000
+variable total_run equal 100000
 
 variable sigma_s_s equal 3.13
 variable sigma_w_w equal 3.1
@@ -23,13 +23,13 @@ variable dimen_x equal 50
 variable dimen_y equal 30
 variable x_max equal 3.170000*${dimen_x}
 variable y_max equal 5.490601*${dimen_y}
-variable top_vac equal 120.0
+variable top_vac equal 150.0
 variable lattice_height equal 12.288000
 variable z_max equal ${lattice_height}+${top_vac}
 
 # create water droplet
 variable drop_height equal 30.0 # max height given by Frédéric Leroy
-variable drop_width equal 45.0
+variable drop_width equal 60.0
 
 variable half_x equal ${x_max}/2
 variable drop_x_start equal ${half_x}-(${drop_width}/2)
@@ -45,7 +45,7 @@ processors 1 * 1
 region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
 create_box 7 unit_two_layer
 
-read_data samples/processed_40_by_40.lammps add merge
+read_data samples/processed_50_by_30.lammps add merge
 mass 7 18.0
 
 region water_drop block ${drop_x_start} ${drop_x_end} 0.0 ${y_max} ${drop_z_start} ${drop_z_end} units box
@@ -93,11 +93,11 @@ dump 1 all atom 5 relax.lammpstrj
 
 fix gravity w gravity 2.352e-16 vector 0 0 -1
 
-fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
-velocity all create 300 8782734 mom yes rot yes dist gaussian
+fix nvt all nvt temp 300.0 300.0 ${Tdamp}
+# velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
 run ${total_run}
-unfix npt
+unfix nvt
 
 unfix gravity
 
