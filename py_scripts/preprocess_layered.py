@@ -22,9 +22,8 @@ def preprocess(arr):
     # arr[0] = map_atom_to_type(arr[0])
 
     for i in range(1, len(arr)):
-        arr[i] = float(arr[i])
+        arr[i] = abs(float(arr[i]))
     arr = arr[0:0] + arr[3:]
-    arr[3] = abs(arr[3])
     return arr
 
 def label_layers(atoms, delta=0.005):
@@ -55,7 +54,7 @@ def cleave_last_atoms_along_direction(atoms, direction):
 def execute(input_file):
     data_path = '../samples/' + input_file
     layered_data = utilities.read_csv(__file__, data_path, delimiter=' ', preprocess=preprocess)
-    layered_data = cleave_last_atoms_along_direction(layered_data, 1)
+    # layered_data = cleave_last_atoms_along_direction(layered_data, 1)
 
     num_atoms = len(layered_data)
     print(num_atoms)
