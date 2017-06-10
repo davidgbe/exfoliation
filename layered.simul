@@ -19,9 +19,10 @@ variable epsilon_w_s equal 1.120*0.239001
 variable cutoff equal 10.0
 
 # define simulation space
-variable dimen equal 40
-variable x_max equal 3.170000*${dimen}
-variable y_max equal 5.490601*${dimen}
+variable dimen_x equal 50
+variable dimen_y equal 30
+variable x_max equal 3.170000*${dimen_x}
+variable y_max equal 5.490601*${dimen_y}
 variable top_vac equal 120.0
 variable lattice_height equal 12.288000
 variable z_max equal ${lattice_height}+${top_vac}
@@ -33,7 +34,7 @@ variable drop_width equal 45.0
 variable half_x equal ${x_max}/2
 variable drop_x_start equal ${half_x}-(${drop_width}/2)
 variable drop_x_end equal ${half_x}+(${drop_width}/2)
-variable drop_z_start equal ${lattice_height}
+variable drop_z_start equal ${lattice_height}+3 # add three angstroms of space
 variable drop_z_end equal ${drop_z_start}+${drop_height}
 
 units real
