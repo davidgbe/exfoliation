@@ -1,8 +1,9 @@
 variable dt equal 1
 variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
-variable minimize_steps equal 100
-variable total_run equal 10
+variable minimize_steps equal 500
+variable total_run equal 3000
+variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
 
 ### potential parameters
 variable sigma_s_s equal 3.13
@@ -19,19 +20,23 @@ variable epsilon_w_s equal 1.120*0.239001
 
 variable cutoff equal 10.0
 
-### define simulation space
-variable x_max equal 80.0
-variable y_max equal 100.0
-variable z_max equal 60.0
-
 # mos2 lattice dimensions
-variable substrate_x equal 40.0
-variable substrate_y equal 50.0
-variable substrate_z equal 24.6
+variable substrate_x equal ${water_density_side}*14
+variable substrate_y equal ${water_density_side}*16
+variable substrate_z equal ${water_density_side}*8
 
-variable substrate_start_x equal (${x_max}/2)-(${substrate_x}/2)
-variable substrate_start_y equal (${y_max}/2)-(${substrate_y}/2)
-variable substrate_start_z equal 3.0
+### define simulation space
+variable water_cell_dim_x equal 13.0
+variable water_cell_dim_y equal 16.0
+variable water_cell_dim_z equal 11.0
+
+variable x_max equal ${water_density_side}*${water_cell_dim_x}+${substrate_x} # ~80
+variable y_max equal ${water_density_side}*${water_cell_dim_y}+${substrate_y} # ~100
+variable z_max equal ${water_density_side}*${water_cell_dim_z}+${substrate_z} # ~60
+
+variable substrate_start_x equal ${water_density_side}*${water_cell_dim_x}/2
+variable substrate_start_y equal ${water_density_side}*${water_cell_dim_y}/2
+variable substrate_start_z equal ${water_density_side}
 
 variable substrate_end_x equal ${substrate_start_x}+${substrate_x}
 variable substrate_end_y equal ${substrate_start_y}+${substrate_y}
@@ -50,8 +55,20 @@ read_data samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate
 mass 7 18.0
 
 # region water_drop block ${drop_x_start} ${drop_x_end} 0.0 ${y_max} ${drop_z_start} ${drop_z_end} units box
-region water_1 block 0.0 ${substrate_start_x} 0.0 ${y_max} 0.0 ${z_max}
-region water_2 block ${substrate_end_x} ${x_max} 0.0 ${y_max} 0.0 ${z_max}
+variable padding equal ${water_density_side}/2
+variable x_up_to_sub equal ${substrate_start_x}-${padding}
+variable x_after_sub equal ${substrate_end_x}+${padding}
+variable y_up_to_sub equal ${substrate_start_y}-${padding}
+variable y_after_sub equal ${substrate_end_y}+${padding}
+variable z_up_to_sub equal ${substrate_start_z}-${padding}
+variable z_after_sub equal ${substrate_end_z}+${padding}
+
+region water_1 block 0.0 ${x_up_to_sub} 0.0 ${y_max} 0.0 ${z_max}
+region water_2 block ${x_after_sub} ${x_max} 0.0 ${y_max} 0.0 ${z_max}
+region water_3 block ${x_up_to_sub} ${substrate_end_x} 0.0 ${y_up_to_sub} 0.0 ${z_max}
+region water_4 block ${x_up_to_sub} ${substrate_end_x} ${y_after_sub} ${y_max} 0.0 ${z_max}
+region water_5 block ${x_up_to_sub} ${substrate_end_x} ${y_up_to_sub} ${y_after_sub} 0.0 ${z_up_to_sub}
+region water_6 block ${x_up_to_sub} ${substrate_end_x} ${y_up_to_sub} ${y_after_sub} ${z_after_sub} ${z_max}
 
 group mo type 2 5
 group s type 1 3 4 6
@@ -60,10 +77,13 @@ set group mo type 1
 set group s type 2
 set group w type 3
 
-lattice sc 3.104 # 0.033427 molecules per cubic angstrom
+lattice sc ${water_density_side}
 create_atoms 3 region water_1 units box
 create_atoms 3 region water_2 units box
-
+create_atoms 3 region water_3 units box
+create_atoms 3 region water_4 units box
+create_atoms 3 region water_5 units box
+create_atoms 3 region water_6 units box
 
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
