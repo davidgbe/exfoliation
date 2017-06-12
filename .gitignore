@@ -1,3 +1,4 @@
-relax.lammpstrj
+*.lammpstrj
 log.lammps
 restart.equil
+

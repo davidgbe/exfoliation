@@ -1,6 +1,6 @@
 echo both
 variable Text equal 300.0
-variable Nrun0 equal  20000
+variable Nrun0 equal 20000
 variable sigma equal 3.1
 variable tau equal 1703.41 # fs
 variable dt equal 0.005*${tau}
