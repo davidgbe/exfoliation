@@ -2,7 +2,7 @@ variable dt equal 1
 variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 500
-variable n_run_1 equal 20000
+variable n_run_1 equal 15000
 variable n_run_2 equal 40000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
@@ -140,11 +140,11 @@ variable v equal ${fixed_top}*${sr}*1.0e-15
 
 region top block INF INF INF INF ${fixed_top} INF units box
 group top region top
-velocity top set 0.0 ${v} 0.0
+velocity top set ${v} 0.0 0.0
 fix ftop top setforce 0.0 0.0 0.0
 
 group mid subtract w top bot
-velocity mid ramp vy 0.0 ${v} z ${fixed_bottom} ${fixed_top} sum yes
+velocity mid ramp vx   0.0 ${v} z ${fixed_bottom} ${fixed_top} sum yes
 
 fix nvt all nvt temp 350.0 350.0 ${Tdamp}
 timestep ${dt}
