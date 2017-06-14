@@ -3,10 +3,10 @@ variable Tdamp equal 50.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 500
 variable n_run_1 equal 10000
-variable n_run_2 equal 30000
+variable n_run_2 equal 90000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 1.0e15 # shear rate (s^-1)
+variable sr equal 3.5e15 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_s_s equal 3.13
@@ -115,7 +115,7 @@ minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 unfix min
 reset_timestep 0
 
-dump 1 all atom 5 relax.lammpstrj
+dump 1 all atom 1000 relax.lammpstrj
 
 # fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
