@@ -121,7 +121,7 @@ dump 1 all atom 1000 relax.lammpstrj
 # run 10000 
 # unfix npt
 
-fix nvt all nvt temp 350.0 350.0 ${Tdamp}
+fix nvt all nvt temp 10.0 350.0 ${Tdamp}
 timestep ${dt}
 run ${n_run_1}
 unfix nvt
