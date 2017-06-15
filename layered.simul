@@ -85,7 +85,7 @@ minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 unfix min
 reset_timestep 0
 
-dump 1 all atom 5 relax.lammpstrj
+dump 1 all atom 1000 relax.lammpstrj
 
 # fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
