@@ -1,5 +1,5 @@
 variable dt equal 1
-variable Tdamp equal 50.0*${dt}
+variable Tdamp equal 500.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 100
 variable total_run equal 50000
