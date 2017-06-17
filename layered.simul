@@ -2,7 +2,7 @@ variable dt equal 1
 variable Tdamp equal 100.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 1000
-variable total_run equal 50000
+variable total_run equal 10000
 
 variable sigma_se_se equal 3.25
 variable sigma_wa_wa equal 3.1
@@ -85,19 +85,17 @@ minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 unfix min
 reset_timestep 0
 
-dump 1 all atom 1000 relax.lammpstrj
+dump 1 all atom 100 relax.lammpstrj
 
 # fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
 # unfix npt
 
-fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
-# velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
+fix nvt all nvt temp 10.0 300.0 ${Tdamp} # x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
+# velocity all create 300 8782734 mom yes rot yes dist gaussian
 run ${total_run}
-unfix npt
-
-# velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
+unfix nvt
 # npt at 10k for 50000 
 # heat from 10k to 300k in 50000 steps
 
