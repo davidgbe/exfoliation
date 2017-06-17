@@ -16,7 +16,7 @@ variable epsilon_wa_wa equal 0.596151
 variable epsilon_wa_w equal 0.1917*0.239001 # NEEDS TO BE CHANGED
 variable epsilon_wa_se equal 1.120*0.239001 # NEEDS TO BE CHANGED
 
-variable cutoff equal 10.0
+variable cutoff equal 15.0
 
 # define simulation space
 variable dimen_x equal 50
