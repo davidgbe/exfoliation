@@ -85,9 +85,9 @@ min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 unfix min
 
-create_atoms 3 region water_drop units box
+# create_atoms 3 region water_drop units box
 
-minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
+# minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 
 # fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
