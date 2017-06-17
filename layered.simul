@@ -1,8 +1,8 @@
 variable dt equal 1
 variable Tdamp equal 100.0*${dt}
 variable Pdamp equal 500.0*${dt}
-variable minimize_steps equal 1000
-variable total_run equal 10000
+variable minimize_steps equal 3000
+variable total_run equal 60000
 
 variable sigma_se_se equal 3.25
 variable sigma_wa_wa equal 3.1
@@ -58,7 +58,6 @@ set group se type 2
 set group wa type 3
 
 lattice sc 3.104 # 0.033427 molecules per cubic angstrom
-# create_atoms 3 region water_drop units box
 
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
@@ -79,13 +78,16 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
+dump 1 all atom 1000 relax.lammpstrj
+
 fix min all box/relax x 0.0 y 0.0
 min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 unfix min
-reset_timestep 0
 
-dump 1 all atom 100 relax.lammpstrj
+create_atoms 3 region water_drop units box
+
+minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 
 # fix npt all npt temp 10.0 10.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # run 10000 
