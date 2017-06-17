@@ -4,26 +4,26 @@ variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 100
 variable total_run equal 50000
 
-variable sigma_s_s equal 3.13
-variable sigma_w_w equal 3.1
-variable sigma_mo_mo equal 4.2 # unused, but taken from the Liang model
-variable sigma_w_mo equal (${sigma_w_w}+${sigma_mo_mo})/2
-variable sigma_w_s equal (${sigma_w_w}+${sigma_s_s})/2
+variable sigma_se_se equal 3.25
+variable sigma_wa_wa equal 3.1
+variable sigma_w_w equal 4.2 # unused, but taken from the Liang model
+variable sigma_wa_mo equal (${sigma_wa_wa}+${sigma_w_w})/2
+variable sigma_wa_se equal (${sigma_wa_wa}+${sigma_se_se})/2
 
-variable epsilon_s_s equal 0.00693*23.0609 # second number is kcal/mol / ev
-variable epsilon_w_w equal 0.596151
+variable epsilon_se_se equal 0.0285*23.0609 # second number is kcal/mol / ev
+variable epsilon_wa_wa equal 0.596151
 # interaction epsilons provided by Frédéric Leroy in kJ/mol, converted to kCal/mol
-variable epsilon_w_mo equal 0.1917*0.239001
-variable epsilon_w_s equal 1.120*0.239001
+variable epsilon_wa_w equal 0.1917*0.239001 # NEEDS TO BE CHANGED
+variable epsilon_wa_se equal 1.120*0.239001 # NEEDS TO BE CHANGED
 
 variable cutoff equal 10.0
 
 # define simulation space
 variable dimen_x equal 50
 variable dimen_y equal 30
-variable x_max equal 3.154*${dimen_x}
-variable y_max equal 5.46289*${dimen_y}
-variable lattice_height equal 12.341
+variable x_max equal 3.297*${dimen_x}
+variable y_max equal 5.71057*${dimen_y}
+variable lattice_height equal 12.982
 variable top_vac equal 150.0
 variable z_max equal ${lattice_height}+${top_vac}
 
@@ -45,17 +45,17 @@ processors 1 * 1
 region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
 create_box 7 unit_two_layer
 
-read_data samples/processed_50_by_30.lammps add merge
+read_data samples/processed_wse2_50_by_30.lammps add merge
 mass 7 18.0
 
 region water_drop block ${drop_x_start} ${drop_x_end} 0.0 ${y_max} ${drop_z_start} ${drop_z_end} units box
 
-group mo type 2 5
-group s type 1 3 4 6
-group w type 7
-set group mo type 1
-set group s type 2
-set group w type 3
+group w type 2 5
+group se type 1 3 4 6
+group wa type 7
+set group w type 1
+set group se type 2
+set group wa type 3
 
 lattice sc 3.104 # 0.033427 molecules per cubic angstrom
 # create_atoms 3 region water_drop units box
@@ -65,15 +65,15 @@ neigh_modify delay 0 every 1 check yes
 
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentialsvector 0 0 -1
-pair_coeff * * sw mos2_2013.sw Mo S NULL NULL NULL NULL NULL
+pair_coeff * * sw wse2.sw W Se NULL NULL NULL NULL NULL
 # for LJ potentials
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 
 pair_coeff 1 * lj/cut 0.0 0.0
-pair_coeff 2 2 lj/cut ${epsilon_s_s} ${sigma_s_s}
-pair_coeff 3 3 lj/cut ${epsilon_w_w} ${sigma_w_w}
-pair_coeff 1 3 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
-pair_coeff 2 3 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 2 2 lj/cut ${epsilon_se_se} ${sigma_se_se}
+pair_coeff 3 3 lj/cut ${epsilon_wa_wa} ${sigma_wa_wa}
+# pair_coeff 1 3 lj/cut ${epsilon_wa_w} ${sigma_w_mo}
+# pair_coeff 2 3 lj/cut ${epsilon_wa_se} ${sigma_w_s}
 
 thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
