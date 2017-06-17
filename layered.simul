@@ -39,7 +39,7 @@ variable drop_z_end equal ${drop_z_start}+${drop_height}
 
 units real
 atom_style atomic
-boundary p p f
+boundary p p for
 processors 1 * 1
 
 region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
@@ -91,11 +91,11 @@ dump 1 all atom 1000 relax.lammpstrj
 # run 10000 
 # unfix npt
 
-fix nvt all nvt temp 300.0 300.0 ${Tdamp}
+fix npt all npt temp 300.0 300.0 ${Tdamp} x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
 # velocity all create 300 8782734 mom yes rot yes dist gaussian
 timestep ${dt}
 run ${total_run}
-unfix nvt
+unfix npt
 
 # velocity all create ${Text} 8782734 mom yes rot yes dist gaussian
 # npt at 10k for 50000 
