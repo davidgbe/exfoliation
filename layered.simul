@@ -1,7 +1,7 @@
 variable dt equal 1
-variable Tdamp equal 50.0*${dt}
+variable Tdamp equal 100.0*${dt}
 variable Pdamp equal 500.0*${dt}
-variable minimize_steps equal 100
+variable minimize_steps equal 1000
 variable total_run equal 50000
 
 variable sigma_se_se equal 3.25
@@ -39,8 +39,8 @@ variable drop_z_end equal ${drop_z_start}+${drop_height}
 
 units real
 atom_style atomic
-boundary p p for
-processors 1 * 1
+boundary p p p
+processors * * *
 
 region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
 create_box 7 unit_two_layer
