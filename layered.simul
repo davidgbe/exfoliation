@@ -10,7 +10,6 @@ variable sigma_wa_se equal (${sigma_wa_wa}+${sigma_se_se})/2
 
 variable epsilon_se_se equal 0.65723565 # 0.0285 eV * 23.0609 kcal/mol / eV
 variable epsilon_wa_wa equal 0.596151
-# interaction epsilons provided by Frédéric Leroy in kJ/mol, converted to kCal/mol
 variable epsilon_wa_se equal 0.62594863206 # inferred from mixing of epsilon se-se and wa-wa
 
 variable cutoff equal 15.0
@@ -74,7 +73,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 1000 relax.lammpstrj
+dump 1 all atom 100 relax.lammpstrj
 
 fix min all box/relax x 0.0 y 0.0
 min_style cg
