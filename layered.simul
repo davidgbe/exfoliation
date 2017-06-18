@@ -2,7 +2,7 @@ variable dt equal 1
 variable Tdamp equal 500.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 3000
-variable total_run equal 60000
+variable total_run equal 100000
 
 variable sigma_se_se equal 3.25
 variable sigma_wa_wa equal 3.1
