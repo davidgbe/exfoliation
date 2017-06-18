@@ -1,0 +1,8 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=16:IB
+#PBS -l walltime=6:00:00
+#PBS -d .
+cd exfoliation
+
+source /usr/usc/lammps/default/setup.sh
+mpirun -np 16 /staging/dgb/davidgbe/lammps/src/lmp_mpi < layered.simul
