@@ -103,7 +103,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 5 relax.lammpstrj
+dump 1 all atom 5000 relax.lammpstrj
 
 min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
