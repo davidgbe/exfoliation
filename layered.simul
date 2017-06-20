@@ -26,7 +26,7 @@ variable cutoff equal 10.0
 # mos2 lattice dimensions
 variable substrate_x equal ${water_density_side}*162
 variable substrate_y equal ${water_density_side}*160
-variable substrate_z equal ${water_density_side}*4
+variable substrate_z equal ${water_density_side}*8
 
 ### define simulation space
 variable water_cell_dim_x equal 40.0
@@ -126,7 +126,7 @@ unfix nvt
 variable fixed_height equal 6.2
 
 variable fixed_bottom equal ${fixed_height}
-region bot block INF INF INF INF INF ${fixed_bottom} units box
+region bot block INF INF INF INF 0.0 ${fixed_bottom} units box
 group bot region bot
 velocity bot set 0.0 0.0 0.0
 fix fbot bot setforce 0.0 0.0 0.0
@@ -134,7 +134,7 @@ fix fbot bot setforce 0.0 0.0 0.0
 variable fixed_top equal ${z_max}-${fixed_height}
 variable v equal ${fixed_top}*${sr}*1.0e-15
 
-region top block INF INF INF INF ${fixed_top} INF units box
+region top block INF INF INF INF ${fixed_top} ${z_max} units box
 group top region top
 velocity top set ${v} 0.0 0.0
 fix ftop top setforce 0.0 0.0 0.0
