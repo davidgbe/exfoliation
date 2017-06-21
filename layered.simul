@@ -6,7 +6,7 @@ variable n_run_1 equal 500
 variable n_run_2 equal 40000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 5.0e11 # shear rate (s^-1)
+variable sr equal 1.0e11 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_s_s equal 3.13
@@ -102,7 +102,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 5 exfoliation.lammpstrj
+dump 1 all atom 25 exfoliation.lammpstrj
 
 create_atoms 3 region water_1 units box
 create_atoms 3 region water_2 units box
