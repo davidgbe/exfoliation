@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -l nodes=5:ppn=16:IB
-#PBS -l walltime=6:00:00
+#PBS -l walltime=2:00:00
 #PBS -d .
 cd exfoliation
 
