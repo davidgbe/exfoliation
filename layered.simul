@@ -6,7 +6,7 @@ variable n_run_1 equal 500
 variable n_run_2 equal 40000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 1.0e11 # shear rate (s^-1)
+variable sr equal 5.0e11 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_s_s equal 3.13
@@ -140,17 +140,17 @@ fix ftop top setforce 0.0 0.0 0.0
 group not_liquid union top bot mo s
 group liquid subtract all not_liquid
 
-fix nve_not_liquid all nve
-# fix nvt_liquid liquid nvt temp 350.0 350.0 ${Tdamp}
+fix nve_not_liquid not_liquid nve
+fix nvt_liquid liquid nvt temp 350.0 350.0 ${Tdamp}
 timestep ${dt}
 
 velocity liquid ramp vx 0.0 ${v} z ${fixed_bottom} ${fixed_top} sum yes
 compute temp_velocity_exempt liquid temp/ramp vx 0.0 ${v} z ${fixed_bottom} ${fixed_top} units box
-# fix_modify nvt_liquid temp temp_velocity_exempt
+fix_modify nvt_liquid temp temp_velocity_exempt
 
 run ${n_run_2}
 
-# unfix nvt_liquid
+unfix nvt_liquid
 unfix nve_not_liquid
 
 undump 1
