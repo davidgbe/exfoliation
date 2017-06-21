@@ -1,12 +1,12 @@
 variable dt equal 1
 variable Tdamp equal 500.0*${dt}
 variable Pdamp equal 500.0*${dt}
-variable minimize_steps equal 3000
-variable n_run_1 equal 15000
-variable n_run_2 equal 80000
+variable minimize_steps equal 500
+variable n_run_1 equal 500
+variable n_run_2 equal 40000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 1.0e12 # shear rate (s^-1)
+variable sr equal 5.0e11 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_se_se equal 3.25
@@ -19,15 +19,15 @@ variable epsilon_wa_se equal 0.62594863206 # inferred from mixing of epsilon se-
 
 variable cutoff equal 15.0
 
-# mos2 lattice dimensions
+# WSe2 lattice dimensions
 variable substrate_x equal ${water_density_side}*14
 variable substrate_y equal ${water_density_side}*17
 variable substrate_z equal ${water_density_side}*9
 
 ### define simulation space
-variable water_cell_dim_x equal 13.0
-variable water_cell_dim_y equal 16.0
-variable water_cell_dim_z equal 11.0
+variable water_cell_dim_x equal 30
+variable water_cell_dim_y equal 16
+variable water_cell_dim_z equal 12
 
 variable x_max equal ${water_density_side}*${water_cell_dim_x}+${substrate_x} # ~80
 variable y_max equal ${water_density_side}*${water_cell_dim_y}+${substrate_y} # ~100
@@ -49,11 +49,11 @@ processors * * *
 region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} 0.0 ${z_max} units box
 create_box 7 unit_two_layer
 
-# dimensions of mos2 are 40.0 x 50.0 x 24.6 angstroms
-read_data samples/processed_wse2_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
 mass 7 18.0
 
-# region water_drop block ${drop_x_start} ${drop_x_end} 0.0 ${y_max} ${drop_z_start} ${drop_z_end} units box
+# dimensions of mos2 are 40.0 x 50.0 x 24.6 angstroms
+read_data samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
+
 variable padding equal ${water_density_side}/2
 variable x_before_sub equal ${substrate_start_x}-${padding}
 variable x_after_sub equal ${substrate_end_x}+${padding}
@@ -81,7 +81,6 @@ lattice sc ${water_density_side}
 neighbor 2.0 bin
 neigh_modify delay 0 every 1 check yes
 
-
 ### define potentials
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentialsvector 0 0 -1
@@ -98,12 +97,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 1000 exfoliation.lammpstrj
-
-fix min all box/relax x 0.0 y 0.0
-min_style cg
-minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
-unfix min
+dump 1 all atom 25 wse2_exfoliation.lammpstrj
 
 create_atoms 3 region water_1 units box
 create_atoms 3 region water_2 units box
@@ -112,10 +106,12 @@ create_atoms 3 region water_4 units box
 create_atoms 3 region water_5 units box
 create_atoms 3 region water_6 units box
 
+min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 
+fix nvt all nvt temp 350.0 350.0 ${Tdamp}
 timestep ${dt}
-fix nvt all nvt temp 10.0 300.0 ${Tdamp}
+velocity all create 350.0 4928459 rot no mom yes dist gaussian
 run ${n_run_1}
 unfix nvt
 
@@ -123,26 +119,36 @@ unfix nvt
 variable fixed_height equal 6.2
 
 variable fixed_bottom equal ${fixed_height}
-region bot block INF INF INF INF INF ${fixed_bottom} units box
+region bot block INF INF INF INF 0.0 ${fixed_bottom} units box
 group bot region bot
-velocity bot set ${v} 0.0 0.0
+velocity bot set 0.0 0.0 0.0
 fix fbot bot setforce 0.0 0.0 0.0
 
 variable fixed_top equal ${z_max}-${fixed_height}
 variable v equal ${fixed_top}*${sr}*1.0e-15
 
-region top block INF INF INF INF ${fixed_top} INF units box
+region top block INF INF INF INF ${fixed_top} ${z_max} units box
 group top region top
-velocity top set 0.0 0.0 0.0
+velocity top set ${v} 0.0 0.0
 fix ftop top setforce 0.0 0.0 0.0
 
-group mid subtract w top bot
-velocity mid ramp vx ${v} 0.0 z ${fixed_bottom} ${fixed_top} sum yes
+group not_liquid union top bot w se
+group liquid subtract all not_liquid
 
-fix nvt all nvt temp 300.0 300.0 ${Tdamp}
+fix nve_not_liquid not_liquid nve
+fix nvt_liquid liquid nvt temp 350.0 350.0 ${Tdamp}
+timestep ${dt}
+
+velocity liquid ramp vx 0.0 ${v} z ${fixed_bottom} ${fixed_top} sum yes
+compute temp_velocity_exempt liquid temp/ramp vx 0.0 ${v} z ${fixed_bottom} ${fixed_top} units box
+fix_modify nvt_liquid temp temp_velocity_exempt
+
 run ${n_run_2}
-unfix nvt
+
+unfix nvt_liquid
+unfix nve_not_liquid
 
 undump 1
 
-write_restart exfoliation.equil
+# write_restart restart.equil
+
