@@ -76,9 +76,6 @@ region water_6 block ${x_before_sub} ${substrate_end_x} ${y_before_sub} ${y_afte
 group mo type 2 5
 group s type 1 3 4 6
 group w type 7
-set group mo type 1
-set group s type 2
-set group w type 3
 
 lattice sc ${water_density_side}
 
@@ -88,15 +85,23 @@ neigh_modify delay 0 every 1 check yes
 ### define potentials
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentialsvector 0 0 -1
-pair_coeff * * sw mos2_2013.sw Mo S NULL NULL NULL NULL NULL
+pair_coeff * * sw mos2_2013.sw S Mo S S Mo S NULL
 # for LJ potentials
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 
-pair_coeff 1 * lj/cut 0.0 0.0
-pair_coeff 2 2 lj/cut ${epsilon_s_s} ${sigma_s_s}
-pair_coeff 3 3 lj/cut ${epsilon_w_w} ${sigma_w_w}
-pair_coeff 1 3 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
-pair_coeff 2 3 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 1 6 lj/cut ${epsilon_s_s} ${sigma_s_s}
+pair_coeff 3 4 lj/cut ${epsilon_s_s} ${sigma_s_s}
+
+pair_coeff 7 7 lj/cut ${epsilon_w_w} ${sigma_w_w}
+
+pair_coeff 2 7 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
+pair_coeff 5 7 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
+
+pair_coeff 1 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 3 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 4 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 6 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+
 
 thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
@@ -104,12 +109,12 @@ thermo 10
 
 dump 1 all atom 25 exfoliation.lammpstrj
 
-create_atoms 3 region water_1 units box
-create_atoms 3 region water_2 units box
-create_atoms 3 region water_3 units box
-create_atoms 3 region water_4 units box
-create_atoms 3 region water_5 units box
-create_atoms 3 region water_6 units box
+create_atoms 7 region water_1 units box
+create_atoms 7 region water_2 units box
+create_atoms 7 region water_3 units box
+create_atoms 7 region water_4 units box
+create_atoms 7 region water_5 units box
+create_atoms 7 region water_6 units box
 
 min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
