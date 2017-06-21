@@ -29,7 +29,7 @@ variable substrate_y equal ${water_density_side}*16
 variable substrate_z equal ${water_density_side}*8
 
 ### define simulation space
-variable water_cell_dim_x equal 14
+variable water_cell_dim_x equal 30
 variable water_cell_dim_y equal 16
 variable water_cell_dim_z equal 12
 
