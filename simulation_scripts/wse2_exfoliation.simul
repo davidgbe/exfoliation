@@ -1,10 +1,10 @@
 variable dt equal 1
-variable target_temp equal 300.0
 variable Tdamp equal 500.0*${dt}
 variable Pdamp equal 500.0*${dt}
+variable target_temp equal 300.0
 variable minimize_steps equal 5000
-variable n_run_1 equal 50000
-variable n_run_2 equal 70000
+variable n_run_1 equal 2000
+variable n_run_2 equal 40000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
 variable sr equal 5.0e10 # shear rate (s^-1)
@@ -53,7 +53,7 @@ create_box 7 unit_two_layer
 mass 7 18.0
 
 # dimensions of mos2 are 40.0 x 50.0 x 24.6 angstroms
-read_data samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
+read_data ../samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
 
 variable padding equal ${water_density_side}/2
 variable x_before_sub equal ${substrate_start_x}-${padding}
@@ -70,9 +70,12 @@ region water_4 block ${x_before_sub} ${substrate_end_x} ${y_after_sub} ${y_max} 
 region water_5 block ${x_before_sub} ${substrate_end_x} ${y_before_sub} ${y_after_sub} 0.0 ${z_before_sub}
 region water_6 block ${x_before_sub} ${substrate_end_x} ${y_before_sub} ${y_after_sub} ${z_after_sub} ${z_max}
 
-group mo type 2 5
-group s type 1 3 4 6
-group w type 7
+group w type 2 5
+group se type 1 3 4 6
+group wa type 7
+set group w type 1
+set group se type 2
+set group wa type 3
 
 lattice sc ${water_density_side}
 
@@ -81,43 +84,35 @@ neigh_modify delay 0 every 1 check yes
 
 ### define potentials
 pair_style hybrid/overlay lj/cut ${cutoff} sw
-# for SW potentials
-pair_coeff * * sw potentials/mos2_2013.sw S Mo S S Mo S NULL
+# for SW potentialsvector 0 0 -1
+pair_coeff * * sw ../potentials/wse2.sw W Se NULL NULL NULL NULL NULL
 # for LJ potentials
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 
-pair_coeff 1 6 lj/cut ${epsilon_s_s} ${sigma_s_s}
-pair_coeff 3 4 lj/cut ${epsilon_s_s} ${sigma_s_s}
-
-pair_coeff 7 7 lj/cut ${epsilon_w_w} ${sigma_w_w}
-
-pair_coeff 2 7 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
-pair_coeff 5 7 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
-
-pair_coeff 1 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
-pair_coeff 3 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
-pair_coeff 4 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
-pair_coeff 6 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 1 * lj/cut 0.0 0.0
+pair_coeff 2 2 lj/cut ${epsilon_se_se} ${sigma_se_se}
+pair_coeff 3 3 lj/cut ${epsilon_wa_wa} ${sigma_wa_wa}
+pair_coeff 2 3 lj/cut ${epsilon_wa_se} ${sigma_wa_se}
 
 thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 500 mos2_exfoliation.lammpstrj
+dump 1 all atom 25 ../runs/wse2_exfoliation.lammpstrj
 
-create_atoms 7 region water_1 units box
-create_atoms 7 region water_2 units box
-create_atoms 7 region water_3 units box
-create_atoms 7 region water_4 units box
-create_atoms 7 region water_5 units box
-create_atoms 7 region water_6 units box
+create_atoms 3 region water_1 units box
+create_atoms 3 region water_2 units box
+create_atoms 3 region water_3 units box
+create_atoms 3 region water_4 units box
+create_atoms 3 region water_5 units box
+create_atoms 3 region water_6 units box
 
 min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 
 fix nvt all nvt temp ${target_temp} ${target_temp} ${Tdamp}
 timestep ${dt}
-# velocity all create ${target_temp} 4928459 rot no mom yes dist gaussian
+velocity all create ${target_temp} 4928459 rot no mom yes dist gaussian
 run ${n_run_1}
 unfix nvt
 
@@ -138,7 +133,7 @@ group top region top
 velocity top set ${v} 0.0 0.0
 fix ftop top setforce 0.0 0.0 0.0
 
-group not_liquid union top bot mo s
+group not_liquid union top bot w se
 group liquid subtract all not_liquid
 
 fix nve_not_liquid not_liquid nve
@@ -157,3 +152,4 @@ unfix nve_not_liquid
 undump 1
 
 # write_restart restart.equil
+

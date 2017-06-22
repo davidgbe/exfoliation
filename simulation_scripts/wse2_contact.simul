@@ -41,7 +41,7 @@ processors * * *
 region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
 create_box 7 unit_two_layer
 
-read_data samples/processed_wse2_50_by_30.lammps add merge
+read_data ../samples/processed_wse2_50_by_30.lammps add merge
 mass 7 18.0
 
 region water_drop block ${drop_x_start} ${drop_x_end} 0.0 ${y_max} ${drop_z_start} ${drop_z_end} units box
@@ -60,7 +60,7 @@ neigh_modify delay 0 every 1 check yes
 
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentialsvector 0 0 -1
-pair_coeff * * sw potentials/wse2.sw W Se NULL NULL NULL NULL NULL
+pair_coeff * * sw ../potentials/wse2.sw W Se NULL NULL NULL NULL NULL
 # for LJ potentials
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 
@@ -73,7 +73,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 100 wse2_contact.lammpstrj
+dump 1 all atom 100 ../runs/wse2_contact.lammpstrj
 
 fix min all box/relax x 0.0 y 0.0
 min_style cg
