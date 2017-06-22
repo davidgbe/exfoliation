@@ -73,7 +73,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 100 contact.lammpstrj
+dump 1 all atom 100 wse2_contact.lammpstrj
 
 fix min all box/relax x 0.0 y 0.0
 min_style cg
