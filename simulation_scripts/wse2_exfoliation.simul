@@ -53,7 +53,7 @@ create_box 7 unit_two_layer
 mass 7 18.0
 
 # dimensions of mos2 are 40.0 x 50.0 x 24.6 angstroms
-read_data ../samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
+read_data samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
 
 variable padding equal ${water_density_side}/2
 variable x_before_sub equal ${substrate_start_x}-${padding}
@@ -85,7 +85,7 @@ neigh_modify delay 0 every 1 check yes
 ### define potentials
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentialsvector 0 0 -1
-pair_coeff * * sw ../potentials/wse2.sw W Se NULL NULL NULL NULL NULL
+pair_coeff * * sw potentials/wse2.sw W Se NULL NULL NULL NULL NULL
 # for LJ potentials
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 
@@ -98,7 +98,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 25 ../runs/wse2_exfoliation.lammpstrj
+dump 1 all atom 25 runs/wse2_exfoliation.lammpstrj
 
 create_atoms 3 region water_1 units box
 create_atoms 3 region water_2 units box
