@@ -98,7 +98,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 25 runs/wse2_exfoliation.lammpstrj
+dump 1 all atom 500 runs/wse2_exfoliation.lammpstrj
 
 create_atoms 3 region water_1 units box
 create_atoms 3 region water_2 units box
