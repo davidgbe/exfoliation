@@ -1,4 +1,5 @@
 variable dt equal 1
+variable target_temp equal 300.0
 variable Tdamp equal 500.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 500
@@ -6,7 +7,7 @@ variable n_run_1 equal 500
 variable n_run_2 equal 100000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 1.0e10 # shear rate (s^-1)
+variable sr equal 5.0e10 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_s_s equal 3.13
@@ -119,9 +120,9 @@ create_atoms 7 region water_6 units box
 min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 
-fix nvt all nvt temp 350.0 350.0 ${Tdamp}
+fix nvt all nvt temp ${target_temp} ${target_temp} ${Tdamp}
 timestep ${dt}
-velocity all create 350.0 4928459 rot no mom yes dist gaussian
+velocity all create ${target_temp} 4928459 rot no mom yes dist gaussian
 run ${n_run_1}
 unfix nvt
 
@@ -146,7 +147,7 @@ group not_liquid union top bot mo s
 group liquid subtract all not_liquid
 
 fix nve_not_liquid not_liquid nve
-fix nvt_liquid liquid nvt temp 350.0 350.0 ${Tdamp}
+fix nvt_liquid liquid nvt temp ${target_temp} ${target_temp} ${Tdamp}
 timestep ${dt}
 
 velocity liquid ramp vx 0.0 ${v} z ${fixed_bottom} ${fixed_top} sum yes
