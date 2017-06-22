@@ -1,0 +1,97 @@
+variable dt equal 1
+variable Tdamp equal 50.0*${dt}
+variable Pdamp equal 500.0*${dt}
+variable minimize_steps equal 100
+variable total_run equal 10000
+
+variable sigma_s_s equal 3.13
+variable sigma_w_w equal 3.1
+variable sigma_mo_mo equal 4.2 # unused, but taken from the Liang model
+variable sigma_w_mo equal (${sigma_w_w}+${sigma_mo_mo})/2
+variable sigma_w_s equal (${sigma_w_w}+${sigma_s_s})/2
+
+variable epsilon_s_s equal 0.00693*23.0609 # second number is kcal/mol / ev
+variable epsilon_w_w equal 0.596151
+# interaction epsilons provided by Frédéric Leroy in kJ/mol, converted to kCal/mol
+variable epsilon_w_mo equal 0.1917*0.239001
+variable epsilon_w_s equal 1.120*0.239001
+
+variable cutoff equal 10.0
+
+# define simulation space
+variable dimen equal 40
+variable x_max equal 3.170000*${dimen}
+variable y_max equal 5.490601*${dimen}
+variable top_vac equal 120.0
+variable lattice_height equal 12.288000
+variable z_max equal ${lattice_height}+${top_vac}
+
+# create water droplet
+variable drop_height equal 30.0 # max height given by Frédéric Leroy
+variable drop_width equal 45.0
+
+variable half_x equal ${x_max}/2
+variable drop_x_start equal ${half_x}-(${drop_width}/2)
+variable drop_x_end equal ${half_x}+(${drop_width}/2)
+variable drop_z_start equal ${lattice_height}
+variable drop_z_end equal ${drop_z_start}+${drop_height}
+
+units real
+atom_style atomic
+boundary p p f
+processors 1 * 1
+
+region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} -30 ${z_max} units box
+create_box 7 unit_two_layer
+
+read_data samples/processed_40_by_40.lammps add merge
+mass 7 18.0
+
+region water_drop block ${drop_x_start} ${drop_x_end} 0.0 ${y_max} ${drop_z_start} ${drop_z_end} units box
+
+group mo type 2 5
+group s type 1 3 4 6
+group w type 7
+set group mo type 1
+set group s type 2
+set group w type 3
+
+lattice sc 3.104 # 0.033427 molecules per cubic angstrom
+create_atoms 3 region water_drop units box
+
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+pair_style hybrid/overlay lj/cut ${cutoff} sw
+# for SW potentialsvector 0 0 -1
+pair_coeff * * sw mos2_2013.sw Mo S NULL NULL NULL NULL NULL
+# for LJ potentials
+pair_modify tail yes
+pair_coeff * * lj/cut 0.0 0.0 
+pair_coeff 1 * lj/cut 0.0 0.0
+pair_coeff 2 2 lj/cut ${epsilon_s_s} ${sigma_s_s}
+pair_coeff 3 3 lj/cut ${epsilon_w_w} ${sigma_w_w}
+pair_coeff 1 3 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
+pair_coeff 2 3 lj/cut ${epsilon_w_s} ${sigma_w_s}
+
+thermo_style custom step temp ke etotal press
+thermo_modify lost ignore flush yes
+thermo 10
+
+fix min all box/relax x 0.0 y 0.0
+min_style cg
+minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
+unfix min
+reset_timestep 0
+
+dump 1 all atom 500 relax.lammpstrj
+
+fix nvt all nvt temp 300.0 300.0 ${Tdamp} # x 0.0 0.0 ${Pdamp} y 0.0 0.0 ${Pdamp}
+velocity all create 300 8782734 mom yes rot yes dist gaussian
+timestep ${dt}
+run ${total_run}
+unfix nvt
+
+undump 1
+
+write_restart restart.equil
