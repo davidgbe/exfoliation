@@ -3,8 +3,8 @@ variable Tdamp equal 500.0*${dt}
 variable Pdamp equal 500.0*${dt}
 variable target_temp equal 300.0
 variable minimize_steps equal 5000
-variable n_run_1 equal 50000
-variable n_run_2 equal 70000
+variable n_run_1 equal 40000
+variable n_run_2 equal 80000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
 variable sr equal 5.0e10 # shear rate (s^-1)
