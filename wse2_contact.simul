@@ -60,7 +60,7 @@ neigh_modify delay 0 every 1 check yes
 
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentialsvector 0 0 -1
-pair_coeff * * sw wse2.sw W Se NULL NULL NULL NULL NULL
+pair_coeff * * sw potentials/wse2.sw W Se NULL NULL NULL NULL NULL
 # for LJ potentials
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 

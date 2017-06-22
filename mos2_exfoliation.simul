@@ -82,7 +82,7 @@ neigh_modify delay 0 every 1 check yes
 ### define potentials
 pair_style hybrid/overlay lj/cut ${cutoff} sw
 # for SW potentials
-pair_coeff * * sw mos2_2013.sw S Mo S S Mo S NULL
+pair_coeff * * sw potentials/mos2_2013.sw S Mo S S Mo S NULL
 # for LJ potentials
 pair_modify tail yes
 pair_coeff * * lj/cut 0.0 0.0 
@@ -103,7 +103,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 500 exfoliation.lammpstrj
+dump 1 all atom 500 mos2_exfoliation.lammpstrj
 
 create_atoms 7 region water_1 units box
 create_atoms 7 region water_2 units box
