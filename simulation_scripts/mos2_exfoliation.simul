@@ -4,14 +4,14 @@ variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 5000
 
 variable target_temp equal 300.0
-variable temper_jump equal 30.0
+variable temper_jump equal 20.0
 variable slow_heat_run equal 10000
-variable slow_eql_run equal 10000
+variable slow_eql_run equal 15000
 
 variable n_run_2 equal 80000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 3.0e11 # shear rate (s^-1)
+variable sr equal 5.0e10 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_s_s equal 3.13
@@ -150,6 +150,8 @@ if "${actual_temp} > ${target_temp}" then "jump simulation_scripts/mos2_exfoliat
 jump "simulation_scripts/mos2_exfoliation.simul" t_loop
 # end loop
 label break
+
+write_restart restart.equil
 
 ### create velocity gradient
 variable fixed_height equal 6.2
