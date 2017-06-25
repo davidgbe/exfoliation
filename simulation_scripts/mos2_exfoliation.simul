@@ -4,7 +4,7 @@ variable Pdamp equal 500.0*${dt}
 variable minimize_steps equal 5000
 
 variable target_temp equal 300.0
-variable temper_jump equal 20.0
+variable temper_jump equal 30.0
 variable slow_heat_run equal 10000
 variable slow_eql_run equal 15000
 
