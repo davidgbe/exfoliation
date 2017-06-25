@@ -5,4 +5,4 @@
 cd exfoliation
 
 source /usr/usc/lammps/default/setup.sh
-mpirun -np 48 /staging/dgb/davidgbe/lammps/src/lmp_mpi < simulation_scripts/mos2_exfoliation_restart.simul
+mpirun -np 48 /staging/dgb/davidgbe/lammps/src/lmp_mpi < simulation_scripts/mos2_exfoliation_restart_5.simul
