@@ -1,0 +1,126 @@
+variable dt equal 1
+variable Tdamp equal 150.0*${dt}
+variable Pdamp equal 500.0*${dt}
+
+variable target_temp equal 300.0
+
+variable n_run_2 equal 80000
+
+variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
+variable sr equal 2.0e11 # shear rate (s^-1)
+
+### potential parameters
+variable sigma_s_s equal 3.13
+variable sigma_w_w equal 3.1
+variable sigma_mo_mo equal 4.2 # unused, but taken from the Liang model
+variable sigma_w_mo equal (${sigma_w_w}+${sigma_mo_mo})/2
+variable sigma_w_s equal (${sigma_w_w}+${sigma_s_s})/2
+
+variable epsilon_s_s equal 0.00693*23.0609 # second number is kcal/mol / ev
+variable epsilon_w_w equal 0.596151
+# interaction epsilons provided by Frédéric Leroy in kJ/mol, converted to kCal/mol
+variable epsilon_w_mo equal 0.1917*0.239001
+variable epsilon_w_s equal 1.120*0.239001
+
+variable cutoff equal 10.0
+
+# mos2 lattice dimensions
+variable substrate_x equal ${water_density_side}*14
+variable substrate_y equal ${water_density_side}*16
+variable substrate_z equal ${water_density_side}*8
+
+### define simulation space
+variable water_cell_dim_x equal 50
+variable water_cell_dim_y equal 16
+variable water_cell_dim_z equal 12
+
+variable x_max equal ${water_density_side}*${water_cell_dim_x}+${substrate_x} # ~200
+variable y_max equal ${water_density_side}*${water_cell_dim_y}+${substrate_y} # ~100
+variable z_max equal ${water_density_side}*${water_cell_dim_z}+${substrate_z} # ~60
+
+variable substrate_start_x equal ${water_density_side}*${water_cell_dim_x}/2
+variable substrate_start_y equal ${water_density_side}*${water_cell_dim_y}/2
+variable substrate_start_z equal ${water_density_side}
+
+variable substrate_end_x equal ${substrate_start_x}+${substrate_x}
+variable substrate_end_y equal ${substrate_start_y}+${substrate_y}
+variable substrate_end_z equal ${substrate_start_z}+${substrate_z}
+
+units real
+atom_style atomic
+boundary p p p
+processors * * *
+
+read_restart restart.equil
+
+group mo type 2 5
+group s type 1 3 4 6
+group w type 7
+
+lattice sc ${water_density_side}
+
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+### define potentials
+pair_style hybrid/overlay lj/cut ${cutoff} sw
+# for SW potentials
+pair_coeff * * sw potentials/mos2_2013.sw S Mo S S Mo S NULL
+# for LJ potentials
+pair_modify tail yes
+pair_coeff * * lj/cut 0.0 0.0 
+pair_coeff 1 6 lj/cut ${epsilon_s_s} ${sigma_s_s}
+pair_coeff 3 4 lj/cut ${epsilon_s_s} ${sigma_s_s}
+
+pair_coeff 7 7 lj/cut ${epsilon_w_w} ${sigma_w_w}
+
+pair_coeff 2 7 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
+pair_coeff 5 7 lj/cut ${epsilon_w_mo} ${sigma_w_mo}
+
+pair_coeff 1 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 3 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 4 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+pair_coeff 6 7 lj/cut ${epsilon_w_s} ${sigma_w_s}
+
+thermo_style custom step temp ke etotal press
+thermo_modify lost ignore flush yes
+thermo 10
+
+dump 1 all atom 500 runs/mos2_exfoliation_3.lammpstrj
+
+### create velocity gradient
+variable fixed_height equal 6.2
+
+variable fixed_bottom equal ${fixed_height}
+region bot block INF INF INF INF 0.0 ${fixed_bottom} units box
+group bot region bot
+velocity bot set 0.0 0.0 0.0
+fix fbot bot setforce 0.0 0.0 0.0
+
+variable fixed_top equal ${z_max}-${fixed_height}
+variable v equal ${fixed_top}*${sr}*1.0e-15
+
+region top block INF INF INF INF ${fixed_top} ${z_max} units box
+group top region top
+velocity top set ${v} 0.0 0.0
+fix ftop top setforce 0.0 0.0 0.0
+
+group not_liquid union top bot mo s
+group liquid subtract all not_liquid
+
+fix nve_not_liquid not_liquid nve
+fix nvt_liquid liquid nvt temp ${target_temp} ${target_temp} ${Tdamp}
+timestep ${dt}
+
+velocity liquid ramp vx 0.0 ${v} z ${fixed_bottom} ${fixed_top} sum yes
+compute temp_velocity_exempt liquid temp/ramp vx 0.0 ${v} z ${fixed_bottom} ${fixed_top} units box
+fix_modify nvt_liquid temp temp_velocity_exempt
+
+run ${n_run_2}
+
+unfix nvt_liquid
+unfix nve_not_liquid
+
+undump 1
+
+# write_restart restart.equil
