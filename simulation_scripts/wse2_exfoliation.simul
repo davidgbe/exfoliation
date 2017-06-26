@@ -1,13 +1,16 @@
 variable dt equal 1
 variable Tdamp equal 500.0*${dt}
 variable Pdamp equal 500.0*${dt}
-variable target_temp equal 300.0
 variable minimize_steps equal 5000
-variable n_run_1 equal 40000
 variable n_run_2 equal 80000
 
+variable target_temp equal 300.0
+variable temper_jump equal 50.0
+variable slow_heat_run equal 10000
+variable slow_eql_run equal 15000
+
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 1.0e11 # shear rate (s^-1)
+variable sr equal 0.5e11 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_se_se equal 3.25
@@ -110,11 +113,35 @@ create_atoms 3 region water_6 units box
 min_style cg
 minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
 
-fix nvt all nvt temp 10.0 ${target_temp} ${Tdamp}
+variable iter loop 1000
+variable actual_temp equal temp
+label t_loop
+variable curr_temp equal (${iter}-1)*${temper_jump}+3.0
+variable next_temp equal ${iter}*${temper_jump}+3.0
+
+print "Iteration: ${iter}"
+print "Current projected temperature: ${curr_temp}"
+print "Next projected temperature: ${next_temp}"
+# heating loop
+fix nvt_heat all nvt temp ${curr_temp} ${next_temp} ${Tdamp}
 timestep ${dt}
-# velocity all create ${target_temp} 4928459 rot no mom yes dist gaussian
-run ${n_run_1}
-unfix nvt
+run ${slow_heat_run}
+unfix nvt_heat
+
+next iter
+
+fix nvt_eql all nvt temp ${next_temp} ${next_temp} ${Tdamp}
+timestep ${dt}
+run ${slow_eql_run}
+unfix nvt_eql
+
+print "Current temperature: ${actual_temp}"
+if "${actual_temp} > ${target_temp}" then "jump simulation_scripts/mos2_exfoliation.simul break"
+jump "simulation_scripts/mos2_exfoliation.simul" t_loop
+# end loop
+label break
+
+write_restart wse2_restart.equil
 
 ### create velocity gradient
 variable fixed_height equal 6.2
