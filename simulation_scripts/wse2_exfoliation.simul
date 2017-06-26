@@ -55,7 +55,7 @@ create_box 7 unit_two_layer
 
 mass 7 18.0
 
-# dimensions of mos2 are 40.0 x 50.0 x 24.6 angstroms
+# dimensions of wse2 are 40.0 x 50.0 x 24.6 angstroms
 read_data samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
 
 variable padding equal ${water_density_side}/2
@@ -87,7 +87,7 @@ neigh_modify delay 0 every 1 check yes
 
 ### define potentials
 pair_style hybrid/overlay lj/cut ${cutoff} sw
-# for SW potentialsvector 0 0 -1
+# for SW potentials
 pair_coeff * * sw potentials/wse2.sw W Se NULL NULL NULL NULL NULL
 # for LJ potentials
 pair_modify tail yes
@@ -136,8 +136,8 @@ run ${slow_eql_run}
 unfix nvt_eql
 
 print "Current temperature: ${actual_temp}"
-if "${actual_temp} > ${target_temp}" then "jump simulation_scripts/mos2_exfoliation.simul break"
-jump "simulation_scripts/mos2_exfoliation.simul" t_loop
+if "${actual_temp} > ${target_temp}" then "jump simulation_scripts/wse2_exfoliation.simul break"
+jump "simulation_scripts/wse2_exfoliation.simul" t_loop
 # end loop
 label break
 
