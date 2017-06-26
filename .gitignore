@@ -1,4 +1,4 @@
 **/*.lammpstrj
 **/log.lammps
-restart.equil
+*.equil
 .DS_Store
