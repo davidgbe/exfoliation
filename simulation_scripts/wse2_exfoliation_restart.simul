@@ -50,13 +50,7 @@ atom_style atomic
 boundary p p p
 processors * * *
 
-region unit_two_layer block 0.0 ${x_max} 0.0 ${y_max} 0.0 ${z_max} units box
-create_box 7 unit_two_layer
-
-mass 7 18.0
-
-# dimensions of wse2 are 40.0 x 50.0 x 24.6 angstroms
-read_data samples/processed_13_by_9_two_layer.lammps add merge shift ${substrate_start_x} ${substrate_start_y} ${substrate_start_z}
+read_restart wse2_restart.equil
 
 variable padding equal ${water_density_side}/2
 variable x_before_sub equal ${substrate_start_x}-${padding}
@@ -102,46 +96,6 @@ thermo_modify lost ignore flush yes
 thermo 10
 
 dump 1 all atom 500 runs/wse2_exfoliation.lammpstrj
-
-create_atoms 3 region water_1 units box
-create_atoms 3 region water_2 units box
-create_atoms 3 region water_3 units box
-create_atoms 3 region water_4 units box
-create_atoms 3 region water_5 units box
-create_atoms 3 region water_6 units box
-
-min_style cg
-minimize 1.0e-8 1.0e-8 ${minimize_steps} ${minimize_steps}
-
-variable iter loop 1000
-variable actual_temp equal temp
-label t_loop
-variable curr_temp equal (${iter}-1)*${temper_jump}+3.0
-variable next_temp equal ${iter}*${temper_jump}+3.0
-
-print "Iteration: ${iter}"
-print "Current projected temperature: ${curr_temp}"
-print "Next projected temperature: ${next_temp}"
-# heating loop
-fix nvt_heat all nvt temp ${curr_temp} ${next_temp} ${Tdamp}
-timestep ${dt}
-run ${slow_heat_run}
-unfix nvt_heat
-
-next iter
-
-fix nvt_eql all nvt temp ${next_temp} ${next_temp} ${Tdamp}
-timestep ${dt}
-run ${slow_eql_run}
-unfix nvt_eql
-
-print "Current temperature: ${actual_temp}"
-if "${actual_temp} > ${target_temp}" then "jump simulation_scripts/wse2_exfoliation.simul break"
-jump "simulation_scripts/wse2_exfoliation.simul" t_loop
-# end loop
-label break
-
-write_restart wse2_restart.equil
 
 ### create velocity gradient
 variable fixed_height equal 6.2
