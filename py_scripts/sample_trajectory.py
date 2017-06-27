@@ -20,6 +20,7 @@ def sample_trj(rel_path, sampling_period):
     check_for_time_step = False
     ignore_num = 0
     check_for_ignore_count = False
+    row_num = 0
     for row in trj_data:
         if ignore_num > 0:
             ignore_num -= 1
@@ -31,7 +32,7 @@ def sample_trj(rel_path, sampling_period):
         elif check_for_time_step:
             check_for_time_step = False
             time_step_num = int(row)
-            if time_step_num % sampling_period == 0:
+            if row_num % sampling_period == 0:
                 sampled_trj.write('ITEM: TIMESTEP' + os.linesep)
                 sampled_trj.write(row)
                 include_step = True
@@ -40,6 +41,7 @@ def sample_trj(rel_path, sampling_period):
             check_for_ignore_count = False
         elif row.startswith('ITEM: NUMBER OF ATOMS'):
             check_for_ignore_count = True
+        row_num += 1
 
     trj_data.close()
     sampled_trj.close()
