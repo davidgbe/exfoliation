@@ -10,7 +10,7 @@ variable slow_heat_run equal 10000
 variable slow_eql_run equal 15000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 0.8e12 # shear rate (s^-1)
+variable sr equal 0.53e12 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_se_se equal 3.25
