@@ -1,0 +1,8 @@
+#!/bin/bash
+#PBS -l nodes=3:ppn=16:IB
+#PBS -l walltime=00:50:00
+#PBS -d .
+cd exfoliation
+
+source /usr/usc/lammps/default/setup.sh
+mpirun -np 48 /staging/dgb/davidgbe/lammps/src/lmp_mpi < simulation_scripts/wse2_exfoliation_restart_1.simul

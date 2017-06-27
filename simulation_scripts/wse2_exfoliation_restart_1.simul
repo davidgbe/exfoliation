@@ -92,7 +92,7 @@ thermo_style custom step temp ke etotal press
 thermo_modify lost ignore flush yes
 thermo 10
 
-dump 1 all atom 500 runs/wse2_exfoliation.lammpstrj
+dump 1 all atom 500 runs/wse2_exfoliation_1.lammpstrj
 
 ### create velocity gradient
 variable fixed_height equal 6.2
