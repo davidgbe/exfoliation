@@ -9,7 +9,7 @@ variable sigma_wa_wa equal 3.1
 variable sigma_wa_se equal (${sigma_wa_wa}+${sigma_se_se})/2
 
 variable epsilon_se_se equal 0.65723565 # 0.0285 eV * 23.0609 kcal/mol / eV
-variable epsilon_wa_wa equal 0.596151
+variable epsilon_wa_wa equal 0.0993538
 variable epsilon_wa_se equal 0.62594863206 # inferred from mixing of epsilon se-se and wa-wa
 
 variable cutoff equal 15.0
