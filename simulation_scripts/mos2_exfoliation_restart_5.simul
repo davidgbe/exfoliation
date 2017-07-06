@@ -4,7 +4,7 @@ variable Pdamp equal 500.0*${dt}
 
 variable target_temp equal 300.0
 
-variable n_run_2 equal 80000
+variable n_run_2 equal 100000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
 variable sr equal 4.9e11 # shear rate (s^-1)
