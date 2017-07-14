@@ -7,7 +7,7 @@ variable target_temp equal 300.0
 variable n_run_2 equal 100000
 
 variable water_density_side equal 3.104 # 0.033427 molecules per cubic angstrom
-variable sr equal 4.7e11 # shear rate (s^-1)
+variable sr equal 3.7e11 # shear rate (s^-1)
 
 ### potential parameters
 variable sigma_s_s equal 3.13
@@ -16,7 +16,7 @@ variable sigma_mo_mo equal 4.2 # unused, but taken from the Liang model
 variable sigma_w_mo equal (${sigma_w_w}+${sigma_mo_mo})/2
 variable sigma_w_s equal (${sigma_w_w}+${sigma_s_s})/2
 
-variable epsilon_s_s equal 0.00693*23.0609 # second number is kcal/mol / ev
+variable epsilon_s_s equal 0.159812037 # 0.00693*23.0609 second number is kcal/mol / ev
 variable epsilon_w_w equal 0.0993538
 # interaction epsilons provided by Frédéric Leroy in kJ/mol, converted to kCal/mol
 variable epsilon_w_mo equal 0.1917*0.239001
